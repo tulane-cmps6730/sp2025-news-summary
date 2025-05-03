@@ -1,42 +1,43 @@
-# CMPS 6730 Sample Project
+Goal: One of the main uses of LLM’s such as ChatGPT and Deepseek is for the  summarization of long 
+complex articles. Text summarizers can save casual readers valuable time and energy and even 
+offer up ideas for users wishing to summarize text themselves. I'm aiming to create a text 
+summarizer capable of paraphrasing news articles from the CNN/DailyMail summarization 
+dataset. My project's goal is to utilize abstractive summarization using both an LSTM with 
+attention and the BART Model then compares their performances. However with the failure of 
+the LSTM model we can compare results without analytical results through a simple comparison 
+of output.
 
-This repository contains starter code for the final project in CMPS 4730/6730: Natural Language Processing at Tulane University.
+Method:
+In my implementation I began preparing the CNN/DailyMail data by importing from kaggle and 
+utilizing pandas dataframes. The raw dataset contained 287,113 training points but due to 
+computational limitations I decided to train my model on only 40,000. This dataset was 
+transformed by splitting the articles and highlights on whitespace and mapping tokens to indexes 
+in a vocabulary. To build vocabulary, token frequency was counted from the training set keeping 
+tokens that showed up at least twice. Plus four special source tokens and three extra target tokens 
+were added. A collate function then pads each batch of sequences so that every batch matches in 
+shape.  
+ 
+My model is an encoder-decoder with attention. The encoder is a bidirectional LSTM that reads 
+articles forward and backwards, producing context rich representations. The decoder is a 
+unidirectional LSTM that at each step computes attention weights over encoder output, forms a 
+context vector, then combines context with the previous word for a next word prediction. I 
+initialize the decoder hidden state by linearly projecting the encoder's final forward and 
+backwards states. During training I use teacher forcing 50 percent of the time feeding in the true 
+prev token, or feeding in the models own prediction.  
+ 
+Then for each word in the target summary the decoder attends over the encoder outputs to pull in 
+context. This produces next word probabilities, repeating until and end of sew token is emitted. I 
+train my model for three epochs with a batch size of 8 using the adamW optimizer at a LR=0.005 
+and a cross entropy loss that ignores padding.
 
-The code in this repository will be copied into your team's project repository at the start of class to provide a starting point for your project.
-
-You should edit this file to include a summary of the goals, methods, and conclusions of your project.
-
-The structure of the code supports the following:
-
-- A simple web UI using Flask to support a demo of the project
-- A command-line interface to support running different stages of the project's pipeline
-- The ability to easily reproduce your work on another machine by using virtualenv and providing access to external data sources.
-
-### Using this repository
-
-- At the start of the course, students will be divided into project teams. Each team will receive a copy of this starter code in a new repository. E.g.:
-https://github.com/tulane-cmps6730/project-alpha
-- Each team member will then clone their team repository to their personal computer to work on their project. E.g.: `git clone https://github.com/tulane-cmps6730/project-alpha`
-- See [GettingStarted.md](GettingStarted.md) for instructions on using the starter code.
-
-
-### Contents
-
-- [docs](docs): template to create slides for project presentations
-- [nlp](nlp): Python project code
-- [notebooks](notebooks): Jupyter notebooks for project development and experimentation
-- [report](report): LaTeX report
-- [tests](tests): unit tests for project code
-
-### Background Resources
-
-The following will give you some technical background on the technologies used here:
-
-1. Refresh your Python by completing this online tutorial: <https://www.learnpython.org/> (3 hours)
-2. Create a GitHub account at <https://github.com/>
-3. Setup git by following <https://help.github.com/en/articles/set-up-git> (30 minutes)
-4. Learn git by completing the [Introduction to GitHub](https://lab.github.com/githubtraining/introduction-to-github) tutorial, reading the [git handbook](https://guides.github.com/introduction/git-handbook/), then completing the [Managing merge conflicts](https://lab.github.com/githubtraining/managing-merge-conflicts) tutorial (1 hour).
-5. Install the Python data science stack from <https://www.anaconda.com/distribution/> . **We will use Python 3** (30 minutes)
-6. Complete the scikit-learn tutorial from <https://www.datacamp.com/community/tutorials/machine-learning-python> (2 hours)
-7. Understand how python packages work by going through the [Python Packaging User Guide](https://packaging.python.org/tutorials/) (you can skip the "Creating Documentation" section). (1 hour)
-8. Complete Part 1 of the [Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world), which is the library we will use for making a web demo for your project.
+Conclusion:
+This project demonstrated the challenge of training BI-Directional LSTM models for abstractive 
+summarization on large datasets such as CNN/DailyMail, particularly under limited 
+computational resources. Despite a solid architecture the LSTM approach failed to generate 
+meaningful summaries due to insufficient training time and data exposure. In contrast the 
+pre-trained BART model showed impressive results. This reinforces the value of transformer 
+models with large scale data and computational resources. These results showcase that when 
+attempting projects or specific NLP tasks it may be more time efficient to choose pretrained 
+models. This project has allowed me the opportunity to explore the creation of text 
+summarization and has allowed me to create a Bi-directional LSTM from scratch. It also gave 
+me the opportunity to learn more about attention and its implementation in NLP tasks.
